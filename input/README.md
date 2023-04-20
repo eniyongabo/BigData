@@ -1,1 +1,0 @@
-spark-submit --class "cs523.SparkWC.SparkWordCount" --master yarn /user/cloudera/cs523/spark/SparkWC.jar /user/cloudera/cs523/spark/input/ /user/cloudera/cs523/spark/output/
