@@ -6,7 +6,7 @@ from kafka import KafkaProducer
 producer = KafkaProducer(bootstrap_servers="localhost:9092")
 TOPIC = "electronic_store"
 
-with open("events.csv", newline="") as csvfile:
+with open("stream/popular_brand_only.csv", newline="") as csvfile:
     reader = csv.DictReader(csvfile)
 
     for row in reader:
