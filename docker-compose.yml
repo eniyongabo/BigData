@@ -2,14 +2,14 @@ version: "3"
 services:
   zookeeper:
     container_name: zookeeper
-    image: "bitnami/zookeeper:3.8.1"
+    image: "bitnami/zookeeper@sha256:2a9b57ed273c952545b55ecbd40ae2d436174bb28f28476bb1dd2f31c56b51f6"
     ports:
       - "2181:2181"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
   kafka:
     container_name: kafka
-    image: "bitnami/kafka:3.4.0"
+    image: "bitnami/kafka@sha256:425b79a0c64a81da7a6c8df979dd96f7e231fe7e41ce079fd0a9468ac2250978"
     ports:
       - "9092:9092"
     environment:
