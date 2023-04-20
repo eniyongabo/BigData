@@ -4,7 +4,9 @@ Fist run:
 docker-compose up -d
 ```
 
-Run the python file `stream/kafka_producer.py' to stream the data
+To run the streamer code:
+    1. Run `pip3 install -r 'stream/requirements.txt'`
+    2. Run `python3 `stream/kafka_producer.py`
 
 And then run  the `KafkaStream.java` file
 
