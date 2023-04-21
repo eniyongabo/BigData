@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Created-By: Apache Maven 3.9.1
-Built-By: jocelinhounon
-Build-Jdk: 20
-
