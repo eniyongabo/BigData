@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TestHBase",
+            "request": "launch",
+            "mainClass": "com.jowilf.TestHBase",
+            "projectName": "spark-demo"
+        },
+        {
+            "type": "java",
             "name": "KafkaStream",
             "request": "launch",
             "mainClass": "com.jowilf.KafkaStream",

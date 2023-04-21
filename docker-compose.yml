@@ -1,12 +1,44 @@
 version: "3"
 services:
+  spark:
+    image: docker.io/bitnami/spark:3.3
+    container_name: spark
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+    ports:
+      - "8181:8080"
+      - "7077:7077"
+    networks:
+      - cluster_network
+  spark-worker:
+    image: docker.io/bitnami/spark:3.3
+    container_name: spark-worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+    networks:
+      - cluster_network
   zookeeper:
     container_name: zookeeper
     image: "bitnami/zookeeper@sha256:2a9b57ed273c952545b55ecbd40ae2d436174bb28f28476bb1dd2f31c56b51f6"
     ports:
-      - "2181:2181"
+      - "2182:2181"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - cluster_network
   kafka:
     container_name: kafka
     image: "bitnami/kafka@sha256:425b79a0c64a81da7a6c8df979dd96f7e231fe7e41ce079fd0a9468ac2250978"
@@ -15,9 +47,22 @@ services:
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
-    depends_on:
-      - zookeeper
-      
+    networks:
+      - cluster_network
+  hbase:
+    build: ./hbase
+    container_name: hbase
+    hostname: hbase
+    networks:
+      - cluster_network
+    ports:
+      - "2181:2181"
+      - "16010:16010"
+      - "16020:16020"
+
+networks:
+  cluster_network:
+    name: kafka-spark-hbase

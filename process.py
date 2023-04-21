@@ -34,3 +34,6 @@ with open("output.csv", "w", newline="") as csvfile:
 
     for row in db:
         writer.writerow(row)
+
+
+# ${HBASE_HOME}/bin/hbase start master
