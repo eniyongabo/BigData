@@ -14,24 +14,20 @@ import org.apache.hadoop.hbase.util.Bytes;
 public class HBaseWriter {
     private Table table;
     private Connection connection;
+    TableUtils tableUtils = new TableUtils();
 
     public HBaseWriter() throws IOException {
-        initConnection();
-    }
-
-    void initConnection() throws IOException {
-        Configuration config = HBaseConfiguration.create();
-        config.set("hbase.zookeeper.quorum", "zookeeper");
-        config.set("hbase.zookeeper.property.clientPort", "2181");
-        connection = ConnectionFactory.createConnection(config);
-        TableName tableName = TableName.valueOf("electronic_store");
-        table = connection.getTable(tableName);
+        connection = tableUtils.newConnection();
+        table = connection.getTable(TableUtils.TABLE);
     }
 
     void write(String time, String key, String value) throws IOException {
         Put p = new Put(Bytes.toBytes(time));
-        p.addImmutable("family1".getBytes(), Bytes.toBytes(key), Bytes.toBytes(value));
+        p.addImmutable(TableUtils.CF_EVENTS.getBytes(), Bytes.toBytes(key), Bytes.toBytes(value));
         table.put(p);
+    }
+
+    public void close() throws IOException {
         table.close();
     }
 }

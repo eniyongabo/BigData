@@ -31,8 +31,10 @@ import org.apache.spark.streaming.kafka010.LocationStrategies;
 import scala.Tuple2;
 
 public class KafkaStream {
+
     public static void main(String[] args) throws InterruptedException, IOException {
-        initHBase();
+        TableUtils tableUtils = new TableUtils();
+        tableUtils.createTable();
         Logger.getRootLogger().setLevel(Level.OFF);
 
         SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("JavaNetworkWordCount");
@@ -62,51 +64,18 @@ public class KafkaStream {
 
         // counts.print();
         counts.foreachRDD((rdd, time) -> {
-            rdd.foreach(v -> {
-                System.out.printf("-------%s, %s\n", v._1(), v._2());
-                new HBaseWriter().write(time.toString(), v._1(), v._2().toString());
-                // saveToHBase(time.toString(), v);
+            rdd.foreachPartition(events -> {
+                HBaseWriter writer = new HBaseWriter();
+                while (events.hasNext()) {
+                    Tuple2<String, Integer> event = events.next();
+                    writer.write(time.toString(), event._1(), event._2().toString());
+                }
+                writer.close();
             });
-            // System.out.println("Testing....");
-
-            // testHBase();
         });
 
         ssc.start();
         ssc.awaitTermination();
     }
 
-    static void initHBase() throws IOException {
-        Configuration config = HBaseConfiguration.create();
-        config.set("hbase.zookeeper.quorum", "zookeeper");
-        config.set("hbase.zookeeper.property.clientPort", "2181");
-
-        System.out.println("here 2");
-        // Create a connection to the HBase server
-        Connection connection = ConnectionFactory.createConnection(config);
-
-        System.out.println("here 3.1");
-
-        // Create an admin object to perform table administration operations
-        Admin admin = connection.getAdmin();
-
-        System.out.println("here 3.2");
-
-        // Create a table descriptor
-        TableName tableName = TableName.valueOf("electronic_store");
-        TableDescriptor tableDesc = TableDescriptorBuilder.newBuilder(tableName)
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("family1")).build();
-
-        // Create the table
-        if (admin.tableExists(tableName)) {
-            admin.disableTable(tableName);
-            admin.deleteTable(tableName);
-        }
-        admin.createTable(tableDesc);
-        System.out.println("here 4");
-
-        // Get a reference to the newly created table
-        // table = connection.getTable(tableName);
-
-    }
 }

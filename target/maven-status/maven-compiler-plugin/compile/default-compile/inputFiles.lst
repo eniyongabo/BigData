@@ -1,3 +1,4 @@
-/Users/jocelinhounon/Documents/VSCodeProjects/final-project/src/main/java/com/cs523/HBaseWriter.java
-/Users/jocelinhounon/Documents/VSCodeProjects/final-project/src/main/java/com/cs523/KafkaStream.java
-/Users/jocelinhounon/Documents/VSCodeProjects/final-project/src/main/java/com/cs523/App.java
+/Users/jocelinhounon/Documents/VSCodeProjects/spark-demo/src/main/java/com/cs523/HBaseWriter.java
+/Users/jocelinhounon/Documents/VSCodeProjects/spark-demo/src/main/java/com/cs523/App.java
+/Users/jocelinhounon/Documents/VSCodeProjects/spark-demo/src/main/java/com/cs523/TableUtils.java
+/Users/jocelinhounon/Documents/VSCodeProjects/spark-demo/src/main/java/com/cs523/KafkaStream.java
