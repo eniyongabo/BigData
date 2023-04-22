@@ -13,7 +13,7 @@ import org.apache.hadoop.hbase.client.TableDescriptor;
 import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 
 public class TableUtils {
-    public static TableName TABLE = TableName.valueOf("electronic_store");
+    public static TableName TABLE = TableName.valueOf("electronic-store");
     public static String CF_EVENTS = "events";
 
     public Configuration getConfig() {

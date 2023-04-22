@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.log4j.Level;
@@ -19,16 +21,20 @@ import org.apache.spark.streaming.kafka010.ConsumerStrategies;
 import org.apache.spark.streaming.kafka010.KafkaUtils;
 import org.apache.spark.streaming.kafka010.LocationStrategies;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import scala.Tuple2;
 
 public class KafkaStream {
+    public static String KAFKA_TOPIC = "electronic-store";
 
     public static void main(String[] args) throws InterruptedException, IOException {
         TableUtils tableUtils = new TableUtils();
         tableUtils.createTable();
         Logger.getRootLogger().setLevel(Level.OFF);
 
-        SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("JavaNetworkWordCount");
+        SparkConf sparkConf = new SparkConf().setAppName("JavaNetworkWordCount");
 
         JavaStreamingContext ssc = new JavaStreamingContext(sparkConf,
                 Durations.seconds(5));
@@ -41,27 +47,33 @@ public class KafkaStream {
         kafkaParams.put("auto.offset.reset", "earliest");
         kafkaParams.put("enable.auto.commit", false);
 
-        List<String> topics = Arrays.asList("electronic_store");
+        List<String> topics = Arrays.asList(KAFKA_TOPIC);
 
         JavaInputDStream<ConsumerRecord<String, String>> stream = KafkaUtils.createDirectStream(
                 ssc,
                 LocationStrategies.PreferConsistent(),
                 ConsumerStrategies.<String, String>Subscribe(topics, kafkaParams));
 
+        ObjectMapper mapper = new ObjectMapper();
+
         JavaPairDStream<String, Integer> counts = stream.map(record -> record.value().toString())
                 .mapToPair((String line) -> {
-                    return new Tuple2<String, Integer>(line.split(",")[1], 1);
+                    JsonNode actualObj = mapper.readTree(line);
+                    return new Tuple2<String, Integer>(actualObj.get("event_type").asText(), 1);
                 }).reduceByKey((x, y) -> x + y);
 
-        // counts.print();
+        counts.print();
         counts.foreachRDD((rdd, time) -> {
-            rdd.foreachPartition(events -> {
+            rdd.foreachPartition((events) -> {
                 HBaseWriter writer = new HBaseWriter();
-                while (events.hasNext()) {
-                    Tuple2<String, Integer> event = events.next();
+                List<Tuple2<String, Integer>> result = IteratorUtils.toList(events);
+                for (Tuple2<String, Integer> event : result) {
                     writer.write(time.toString(), event._1(), event._2().toString());
                 }
                 writer.close();
+
+                // Output to kafa-analytics
+                new KafkaWriter().writeEvents(result);
             });
         });
 

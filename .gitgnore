@@ -1,7 +1,7 @@
 .venv/
 events.csv
 output.csv
-
+env/
 
 target/**
 pom.xml.tag

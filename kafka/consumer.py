@@ -8,7 +8,7 @@ c = Consumer(
     }
 )
 
-c.subscribe(["electronic_store"])
+c.subscribe(["electronic-analytics"])
 
 while True:
     msg = c.poll(1.0)

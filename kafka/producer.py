@@ -4,7 +4,7 @@ import json
 import time
 
 producer = Producer({"bootstrap.servers": "localhost:9092"})
-TOPIC = "electronic_store"
+TOPIC = "electronic-store"
 
 
 def delivery_report(err, msg):
