@@ -1,4 +1,5 @@
 from confluent_kafka import Producer
+from confluent_kafka.admin import AdminClient, NewTopic
 import csv
 import json
 import time
@@ -16,6 +17,15 @@ def delivery_report(err, msg):
         print("Message delivered to {} [{}]".format(msg.topic(), msg.partition()))
 
 
+def create_topics():
+    admin_client = AdminClient({"bootstrap.servers": "localhost:9092"})
+    topic_list = [NewTopic(x) for x in [TOPIC, "electronic-analytics"]]
+    admin_client.create_topics(topic_list)
+
+
+create_topics()
+
+
 with open("kafka/dataset.csv", newline="") as csvfile:
     reader = csv.DictReader(csvfile)
 
@@ -23,4 +33,4 @@ with open("kafka/dataset.csv", newline="") as csvfile:
         producer.poll(0)
         msg = json.dumps(row)
         producer.produce(TOPIC, msg.encode("utf-8"), callback=delivery_report)
-        time.sleep(0.5)
+        time.sleep(0.05)

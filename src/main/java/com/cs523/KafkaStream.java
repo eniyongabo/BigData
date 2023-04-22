@@ -1,6 +1,7 @@
 package com.cs523;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,7 @@ public class KafkaStream {
         SparkConf sparkConf = new SparkConf().setAppName("JavaNetworkWordCount");
 
         JavaStreamingContext ssc = new JavaStreamingContext(sparkConf,
-                Durations.seconds(5));
+                Durations.seconds(2));
 
         Map<String, Object> kafkaParams = new HashMap<>();
         kafkaParams.put("bootstrap.servers", "kafka:29092");
@@ -64,14 +65,25 @@ public class KafkaStream {
 
         counts.print();
         counts.foreachRDD((rdd, time) -> {
+            // HBaseWriter writer = new HBaseWriter();
+            // List<Tuple2<String, Integer>> result = new ArrayList<>();
+            // rdd.foreach(event -> {
+            // result.add(event);
+            // writer.write(time.toString(), event._1(), event._2().toString());
+            // writer.close();
+            // });
+            // // Output to kafa-analytics
+            // new KafkaWriter().writeEvents(result);
+
             rdd.foreachPartition((events) -> {
                 HBaseWriter writer = new HBaseWriter();
                 List<Tuple2<String, Integer>> result = IteratorUtils.toList(events);
+                if (result.size() == 0)
+                    return;
                 for (Tuple2<String, Integer> event : result) {
                     writer.write(time.toString(), event._1(), event._2().toString());
                 }
                 writer.close();
-
                 // Output to kafa-analytics
                 new KafkaWriter().writeEvents(result);
             });

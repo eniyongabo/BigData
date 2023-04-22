@@ -8,6 +8,10 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import scala.Tuple2;
 
 /**
@@ -29,9 +33,12 @@ public class KafkaWriter {
     public void writeEvents(List<Tuple2<String, Integer>> events) {
         Producer<String, String> producer = new KafkaProducer<>(getProps());
         try {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode actualObj = mapper.createObjectNode();
             for (Tuple2<String, Integer> event : events) {
-                producer.send(new ProducerRecord<String, String>(OUTPUT_TOPIC, event._1(), event._2().toString()));
+                actualObj.put(event._1(), event._2());
             }
+            producer.send(new ProducerRecord<String, String>(OUTPUT_TOPIC, "event_type_agg", actualObj.toString()));
         } finally {
             producer.flush();
             producer.close();
