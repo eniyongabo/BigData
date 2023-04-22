@@ -58,12 +58,12 @@ public class KafkaStream {
         ObjectMapper mapper = new ObjectMapper();
 
         JavaPairDStream<String, Integer> counts = stream.map(record -> record.value().toString())
-                .mapToPair((String line) -> {
-                    JsonNode actualObj = mapper.readTree(line);
+                .map((String line) -> mapper.readTree(line)).cache()
+                .mapToPair((JsonNode actualObj) -> {
                     return new Tuple2<String, Integer>(actualObj.get("event_type").asText(), 1);
                 }).reduceByKey((x, y) -> x + y);
 
-        counts.print();
+        // counts.print();
         counts.foreachRDD((rdd, time) -> {
             // HBaseWriter writer = new HBaseWriter();
             // List<Tuple2<String, Integer>> result = new ArrayList<>();
@@ -76,16 +76,14 @@ public class KafkaStream {
             // new KafkaWriter().writeEvents(result);
 
             rdd.foreachPartition((events) -> {
-                HBaseWriter writer = new HBaseWriter();
                 List<Tuple2<String, Integer>> result = IteratorUtils.toList(events);
                 if (result.size() == 0)
                     return;
-                for (Tuple2<String, Integer> event : result) {
-                    writer.write(time.toString(), event._1(), event._2().toString());
-                }
-                writer.close();
                 // Output to kafa-analytics
                 new KafkaWriter().writeEvents(result);
+
+                // write to HBase
+                new HBaseWriter().writeEvents(result, time.toString());
             });
         });
 

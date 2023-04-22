@@ -6,6 +6,14 @@
     "configurations": [
         {
             "type": "java",
+            "name": "SparkSQLAnalyze",
+            "request": "launch",
+            "mainClass": "com.cs523.SparkSQLAnalyze",
+            "projectName": "spark-demo",
+            "vmArgs": "--add-exports java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/sun.security.action=ALL-UNNAMED"
+        },
+        {
+            "type": "java",
             "name": "KafkaStream",
             "request": "launch",
             "mainClass": "com.cs523.KafkaStream",

@@ -17,7 +17,7 @@ COPY config/hbase-site.xml ${HBASE_HOME}/conf
 COPY config/hbase-env.sh ${HBASE_HOME}/conf
 
 
-EXPOSE 2181 8080 8085 16010 16030
+EXPOSE 2181 8080 8085 9090 9095 16010 16030
 
 COPY script/* /script/
 CMD /bin/bash /script/start-pseudo.sh

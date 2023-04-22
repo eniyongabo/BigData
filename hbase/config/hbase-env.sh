@@ -26,7 +26,7 @@
 # into the startup scripts (bin/hbase, etc.)
 
 # The java implementation to use.  Java 1.6 required.
-# export JAVA_HOME=/usr/java/jdk1.6.0/
+export JAVA_HOME=/usr/local/openjdk-8
 
 # Extra Java CLASSPATH elements.  Optional.
 # export HBASE_CLASSPATH=

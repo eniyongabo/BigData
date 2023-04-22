@@ -1,3 +1,4 @@
+import random
 from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, NewTopic
 import csv
@@ -6,6 +7,7 @@ import time
 
 producer = Producer({"bootstrap.servers": "localhost:9092"})
 TOPIC = "electronic-store"
+OUT_TOPIC = "electronic-analytics"
 
 
 def delivery_report(err, msg):
@@ -19,18 +21,32 @@ def delivery_report(err, msg):
 
 def create_topics():
     admin_client = AdminClient({"bootstrap.servers": "localhost:9092"})
-    topic_list = [NewTopic(x) for x in [TOPIC, "electronic-analytics"]]
+    topic_list = [NewTopic(x) for x in [TOPIC, OUT_TOPIC]]
     admin_client.create_topics(topic_list)
+    # print(admin_client.list_topics().topics)
 
 
 create_topics()
-
+# exit(0)
 
 with open("kafka/dataset.csv", newline="") as csvfile:
     reader = csv.DictReader(csvfile)
 
+    producer.produce(OUT_TOPIC, "{}".encode("utf-8"), callback=delivery_report)
+
+    # while True:
+    #     producer.poll(0)
+    #     d = {
+    #         "view": random.randint(0, 20),
+    #         "purchase": random.randint(0, 20),
+    #         "cart": random.randint(0, 20),
+    #     }
+    #     producer.produce(
+    #         OUT_TOPIC, key="", value=json.dumps(d).encode("utf-8"), callback=delivery_report
+    #     )
+    #     time.sleep(0.1)
     for row in reader:
         producer.poll(0)
         msg = json.dumps(row)
         producer.produce(TOPIC, msg.encode("utf-8"), callback=delivery_report)
-        time.sleep(0.05)
+        time.sleep(0.1)

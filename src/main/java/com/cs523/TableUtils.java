@@ -14,7 +14,9 @@ import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 
 public class TableUtils {
     public static TableName TABLE = TableName.valueOf("electronic-store");
+    public static TableName TABLE_ANALYTICS = TableName.valueOf("electronic-analytics");
     public static String CF_EVENTS = "events";
+    public static String CF_REPORT = "report";
 
     public Configuration getConfig() {
         Configuration config = HBaseConfiguration.create();
@@ -45,5 +47,25 @@ public class TableUtils {
         }
         admin.createTable(tableDesc);
         System.out.println("==== Table created!!! ====");
+    }
+
+    public void createAnalyticsTable() throws IOException {
+        // Create a connection to the HBase server
+        Connection connection = newConnection();
+        // Create an admin object to perform table administration operations
+        Admin admin = connection.getAdmin();
+
+        // Create a table descriptor
+        TableDescriptor tableDesc = TableDescriptorBuilder.newBuilder(TABLE_ANALYTICS)
+                .setColumnFamily(ColumnFamilyDescriptorBuilder.of(CF_REPORT))
+                .build();
+
+        // Create the table
+        if (admin.tableExists(TABLE_ANALYTICS)) {
+            admin.disableTable(TABLE_ANALYTICS);
+            admin.deleteTable(TABLE_ANALYTICS);
+        }
+        admin.createTable(tableDesc);
+        System.out.println("==== Table analytics created!!! ====");
     }
 }

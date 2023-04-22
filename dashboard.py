@@ -4,26 +4,53 @@ import plotly.express as px
 import pandas as pd
 
 from dash_utils.event import Event
+from dash_utils.hbase import HBaseReader
 from dash_utils.listener import EventListener
+import plotly.graph_objs as go
 
 # df = pd.read_csv("plotly/data.csv")
 
 app = Dash(__name__)
 
 # events = pd.DataFrame(columns=["date", "view", "purchase", "cart"])
-listener = EventListener(on_new_event=lambda data: event.append(data))
 event = Event()
+hbase = HBaseReader()
+listener = EventListener(on_new_event=lambda data: event.append(data))
 
 
+# app.layout = html.Div(
+#     [
+#         html.H1(children="Title of Dash App", style={"textAlign": "center"}),
+#         # dcc.Dropdown(df.country.unique(), "Canada", id="dropdown-selection"),
+#         dcc.Graph(id="graph-content"),
+#         dcc.Interval(
+#             id="interval-component", interval=1 * 1000, n_intervals=0  # in milliseconds
+#         ),
+#     ]
+# )
 app.layout = html.Div(
-    [
+    className="row",
+    children=[
         html.H1(children="Title of Dash App", style={"textAlign": "center"}),
-        # dcc.Dropdown(df.country.unique(), "Canada", id="dropdown-selection"),
-        dcc.Graph(id="graph-content"),
-        dcc.Interval(
-            id="interval-component", interval=1 * 500, n_intervals=0  # in milliseconds
+        html.Div(
+            className="six columns",
+            children=[
+                dcc.Graph(figure={}, id="brand-sales"),
+            ],
         ),
-    ]
+        html.Div(
+            className="six columns",
+            children=[
+                # dcc.Dropdown(df.country.unique(), "Canada", id="dropdown-selection"),
+                dcc.Graph(id="graph-content"),
+            ],
+        ),
+        dcc.Interval(
+            id="interval-component",
+            interval=1 * 1000,
+            n_intervals=0,  # in milliseconds
+        ),
+    ],
 )
 
 
@@ -32,8 +59,17 @@ app.layout = html.Div(
 )
 def update_graph_live(n):
     print("Heartbeat")
-    listener.consume()
+    # listener.consume()
     return event.fig()
+
+
+@callback(
+    Output(component_id="brand-sales", component_property="figure"),
+    Input("interval-component", "n_intervals"),
+)
+def update_histogram_graph(n):
+    df = hbase.read()
+    return px.histogram(df, x="brand", y="sales")
 
 
 if __name__ == "__main__":

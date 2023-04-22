@@ -7,15 +7,17 @@ class EventListener:
         self.c = Consumer(
             {
                 "bootstrap.servers": "localhost:9092",
-                "group.id": "dashboard",
-                # "auto.offset.reset": "latest",
+                "group.id": "dashboardg",
+                "auto.offset.reset": "earliest",
             }
         )
-        self.on_new_event = on_new_event
+        self.on_new_event = on_new_event 
         self.c.subscribe(["electronic-analytics"])
 
     def consume(self):
         msg = self.c.poll(1.0)
+        while msg is None:
+            msg = self.c.poll(1.0)
         if msg is None:
             print("None Message")
             return

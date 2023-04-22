@@ -28,7 +28,7 @@ class Event:
         self.purchases.pop(idx)
         self.carts.pop(idx)
 
-    def appen_random(self):
+    def append_random(self):
         self.append(
             {
                 "view": random.randint(0, 20),
@@ -47,21 +47,25 @@ class Event:
                     x=self.dates,
                     y=self.views,
                     legendgroup="view",
+                    name="View",
                     legendgrouptitle=Legendgrouptitle(text="View"),
                 ),
                 go.Scatter(
                     x=self.dates,
                     y=self.carts,
+                    name="Cart",
                     legendgroup="cart",
                     legendgrouptitle=Legendgrouptitle(text="Cart"),
                 ),
                 go.Scatter(
                     x=self.dates,
                     y=self.purchases,
+                    name="Purchase",
                     legendgroup="purchase",
                     legendgrouptitle=Legendgrouptitle(text="Purchase"),
                 ),
-            ]
+            ],
+            layout=go.Layout(title="User Behavior in the store app"),
         )
 
     def df(self):

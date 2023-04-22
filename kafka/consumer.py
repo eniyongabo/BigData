@@ -14,6 +14,7 @@ while True:
     msg = c.poll(1.0)
 
     if msg is None:
+        print("None message")
         continue
     if msg.error():
         print("Consumer error: {}".format(msg.error()))
