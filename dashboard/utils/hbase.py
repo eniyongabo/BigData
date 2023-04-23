@@ -3,6 +3,7 @@ import happybase
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.express as px
+from .config import HBASE_URL
 
 brands = [
     "samsung",
@@ -20,8 +21,8 @@ brands = [
 
 class HBaseReader:
     def __init__(self) -> None:
-        # self.connection = happybase.Connection("hbase")
-        self.connection = happybase.Connection("localhost")
+        self.connection = happybase.Connection(HBASE_URL)
+        # self.connection = happybase.Connection("localhost")
 
     def read(self):
         try:
@@ -55,4 +56,5 @@ class HBaseReader:
                 "purchase_count",
             ],
             barmode="group",
+            title="Events by Brand",
         )

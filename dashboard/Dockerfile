@@ -16,9 +16,9 @@ COPY . .
 # Expose the port that the application will listen on
 EXPOSE 8050
 
-RUN apt-get update && apt-get install -y iputils-ping
+# RUN apt-get update && apt-get install -y iputils-ping
 
 # Start the application
 #CMD gunicorn -b 0.0.0.0:8050 main:server --timeout 200 --workers 3
-CMD python main.py
+CMD waitress-serve --host 0.0.0.0 --port 8050 main:server
 #CMD tail -F /dev/null

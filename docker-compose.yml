@@ -73,17 +73,22 @@ services:
       - "16020:16020"
       - "9090:9090"
 
-  # dashboard:
-  #   image: jowilf/dashboard:0.0.1
-  #   build: ./dashboard
-  #   container_name: dashboard
-  #   depends_on:
-  #     - stream
-  #     - hbase
-  #   networks:
-  #     - cluster_network
-  #   ports:
-  #     - "8050:8050"
+  dashboard:
+    image: jowilf/dashboard:0.0.1
+    build: ./dashboard
+    container_name: dashboard
+    depends_on:
+      - stream
+      - hbase
+    environment:
+      HBASE_URL: hbase
+      KAFKA_URL: kafka:29092
+      KAFKA_GROUP_ID: dashboard
+      THREAD_DAEMON: "false"
+    networks:
+      - cluster_network
+    ports:
+      - "8050:8050"
 
   stream:
     image: jowilf/stream:0.0.1

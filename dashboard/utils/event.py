@@ -38,9 +38,9 @@ class Event:
         )
 
     def fig(self):
-        print(self.views)
-        print(self.purchases)
-        print(self.carts)
+        # print(self.views)
+        # print(self.purchases)
+        # print(self.carts)
         return go.Figure(
             data=[
                 go.Scatter(
@@ -65,7 +65,7 @@ class Event:
                     legendgrouptitle=Legendgrouptitle(text="Purchase"),
                 ),
             ],
-            layout=go.Layout(title="User Behavior in the store app"),
+            layout=go.Layout(title="Real Time user behavior in the store app"),
         )
 
     def df(self):

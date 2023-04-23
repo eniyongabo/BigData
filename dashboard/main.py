@@ -9,6 +9,7 @@ from utils.event import Event
 from utils.hbase import HBaseReader
 from utils.listener import EventListener
 import plotly.graph_objs as go
+from utils.config import KAFKA_URL, KAFKA_GROUP_ID, THREAD_DAEMON
 
 # df = pd.read_csv("plotly/data.csv")
 import flask
@@ -34,7 +35,7 @@ listener = EventListener(on_new_event=lambda data: event.append(data))
 app.layout = html.Div(
     className="row",
     children=[
-        html.H1(children="Title of Dash App", style={"textAlign": "center"}),
+        html.H1(children="DashBoard", style={"textAlign": "center"}),
         html.Div(
             className="six columns",
             children=[
@@ -61,7 +62,7 @@ app.layout = html.Div(
     Output("graph-content", "figure"), Input("interval-component", "n_intervals")
 )
 def update_graph_live(n):
-    print("Heartbeat")
+    # print("Heartbeat")
     listener.consume()
     return event.fig()
 
@@ -78,18 +79,18 @@ def update_graph_live(n):
 def kafka_listener():
     c = Consumer(
         {
-            # "bootstrap.servers": "kafka:29092",
-            "bootstrap.servers": "localhost:9092",
-            "group.id": "dashboard",
+            "bootstrap.servers": KAFKA_URL,
+            # "bootstrap.servers": "localhost:9092",
+            "group.id": KAFKA_GROUP_ID,
             "auto.offset.reset": "earliest",
         }
     )
     c.subscribe(["electronic-analytics"])
     while True:
-        print("Running...")
+        # print("Running...")
         msg = c.poll(1.0)
         if msg is None:
-            print("None Message")
+            # print("None Message")
             continue
         if msg.error():
             print("Consumer error: {}".format(msg.error()))
@@ -104,9 +105,9 @@ def kafka_listener():
             listener.add_value(value)
 
 
-thread = threading.Thread(name="interval_query", target=kafka_listener)
-thread.setDaemon(True)
+thread = threading.Thread(name="kafka consumer", target=kafka_listener)
+thread.setDaemon(THREAD_DAEMON)
 thread.start()
 
 if __name__ == "__main__":
-    app.run(debug=True, dev_tools_ui=True, host="0.0.0.0")
+    app.run(debug=True, dev_tools_ui=True, host="0.0.0.0", port=8051)
