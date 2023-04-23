@@ -66,8 +66,7 @@ services:
     depends_on:
       - zookeeper
     networks:
-      cluster_network:
-        ipv4_address: 172.20.0.10
+      - cluster_network
     ports:
       - "16010:16010"
       - "16020:16020"
@@ -102,6 +101,3 @@ services:
 networks:
   cluster_network:
     name: kafka-spark-hbase
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
