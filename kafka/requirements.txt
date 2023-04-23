@@ -1,4 +1,0 @@
-confluent_kafka==2.1.0
-dash==2.9.3
-pandas==2.0.0
-happybase==1.2.0

@@ -1,6 +1,7 @@
 package com.cs523;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.log4j.Level;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -22,6 +23,8 @@ public class SparkSQLAnalyze {
                 .appName("Java Spark SQL basic example")
                 .config(conf)
                 .getOrCreate();
+
+        spark.sparkContext().setLogLevel("ERROR");
 
         StructType schema = new StructType()
                 .add("event_time", DataTypes.StringType)

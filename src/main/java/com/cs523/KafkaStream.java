@@ -33,12 +33,14 @@ public class KafkaStream {
     public static void main(String[] args) throws InterruptedException, IOException {
         TableUtils tableUtils = new TableUtils();
         tableUtils.createTable();
-        Logger.getRootLogger().setLevel(Level.OFF);
+        // Logger.getRootLogger().setLevel(Level.OFF);
 
         SparkConf sparkConf = new SparkConf().setAppName("JavaNetworkWordCount");
 
         JavaStreamingContext ssc = new JavaStreamingContext(sparkConf,
                 Durations.seconds(2));
+
+        ssc.sparkContext().setLogLevel("ERROR");
 
         Map<String, Object> kafkaParams = new HashMap<>();
         kafkaParams.put("bootstrap.servers", "kafka:29092");
@@ -63,7 +65,7 @@ public class KafkaStream {
                     return new Tuple2<String, Integer>(actualObj.get("event_type").asText(), 1);
                 }).reduceByKey((x, y) -> x + y);
 
-        // counts.print();
+        counts.print();
         counts.foreachRDD((rdd, time) -> {
             // HBaseWriter writer = new HBaseWriter();
             // List<Tuple2<String, Integer>> result = new ArrayList<>();

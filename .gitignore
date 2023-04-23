@@ -2,6 +2,8 @@
 events.csv
 output.csv
 env/
+__pycache__/
+
 
 target/
 pom.xml.tag
@@ -20,3 +22,5 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+.DS_Store
