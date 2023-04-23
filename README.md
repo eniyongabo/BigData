@@ -1,4 +1,4 @@
 To start this project:
 
-- Run `./rs.sh`
+- Run `./start-all.sh`
 - Navigate to http://localhost:8050/
