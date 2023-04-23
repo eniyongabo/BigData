@@ -65,12 +65,12 @@ public class SparkSQLAnalyze {
                 "SELECT brand, COUNT(event_type) AS purchase_count FROM electronics WHERE event_type='purchase' GROUP BY brand ORDER BY purchase_count DESC");
 
         purchase_per_brand.show();
-        
+
         TableUtils utils = new TableUtils();
         utils.createAnalyticsTable();
 
         saveDatasetToHBase(views_per_brand, "view_count");
-        saveDatasetToHBase(purchase_per_brand, "cart_count");
+        saveDatasetToHBase(cart_per_brand, "cart_count");
         saveDatasetToHBase(purchase_per_brand, "purchase_count");
 
         // result.javaRDD()

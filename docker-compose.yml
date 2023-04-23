@@ -60,17 +60,43 @@ services:
       - cluster_network
 
   hbase:
+    image: jowilf/hbase:0.0.1
     build: ./hbase
     container_name: hbase
-    hostname: hbase
+    depends_on:
+      - zookeeper
     networks:
-      - cluster_network
+      cluster_network:
+        ipv4_address: 172.20.0.10
     ports:
       - "16010:16010"
       - "16020:16020"
       - "9090:9090"
-      - "9095:9095"
+
+  # dashboard:
+  #   image: jowilf/dashboard:0.0.1
+  #   build: ./dashboard
+  #   container_name: dashboard
+  #   depends_on:
+  #     - stream
+  #     - hbase
+  #   networks:
+  #     - cluster_network
+  #   ports:
+  #     - "8050:8050"
+
+  stream:
+    image: jowilf/stream:0.0.1
+    build: ./stream
+    container_name: stream
+    networks:
+      - cluster_network
+    depends_on:
+      - kafka
 
 networks:
   cluster_network:
     name: kafka-spark-hbase
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

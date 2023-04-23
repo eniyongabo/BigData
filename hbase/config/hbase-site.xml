@@ -12,6 +12,10 @@
         <name>hbase.thrift.port</name>
         <value>9090</value>
     </property>
+    <property>
+        <name>hbase.thrift.info.bindAddress</name>
+        <value>0.0.0.0</value>
+    </property>
     <!-- <property>
         <name>hbase.cluster.distributed</name>
         <value>true</value>
