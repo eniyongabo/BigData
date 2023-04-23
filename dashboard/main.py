@@ -1,9 +1,6 @@
-from datetime import datetime
 import threading
 from confluent_kafka import Consumer
-from dash import Dash, html, dcc, callback, Output, Input
-import plotly.express as px
-import pandas as pd
+from dash import Dash, html, dcc, Output, Input
 
 from utils.event import Event
 from utils.hbase import HBaseReader
