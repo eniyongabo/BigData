@@ -71,6 +71,7 @@ public class KafkaStream {
 
         // Category view count
         JavaPairDStream<String, Integer> categoryViewCounts = datas
+                .filter(obj -> obj.get("event_type").asText().equals("view"))
                 .map((JsonNode obj) -> obj.get("category_code").asText(null))
                 .filter(c -> c != null && !c.isBlank())
                 .mapToPair(c -> new Tuple2<String, Integer>(c.split("\\.")[0], 1))
