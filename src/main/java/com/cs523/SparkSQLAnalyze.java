@@ -46,14 +46,6 @@ public class SparkSQLAnalyze {
 
         // Query the total price
 
-        // Dataset<Row> result = spark.sql("SELECT brand, SUM(price) AS total_price FROM
-        // sales GROUP BY brand");
-        // Dataset<Row> sales_per_brand = df.select(col("brand"), col("price"))
-        // .where("event_type == 'purcharse'")
-        // .groupBy(col("brand"))
-        // .sum("price").as("total_sales")
-        // .orderBy(col("sum(price)").desc());
-
         Dataset<Row> views_per_brand = spark.sql(
                 "SELECT brand, COUNT(event_type) AS view_count FROM electronics WHERE event_type='view' GROUP BY brand ORDER BY view_count DESC");
 
@@ -75,14 +67,6 @@ public class SparkSQLAnalyze {
         saveDatasetToHBase(views_per_brand, "view_count");
         saveDatasetToHBase(cart_per_brand, "cart_count");
         saveDatasetToHBase(purchase_per_brand, "purchase_count");
-
-        // result.javaRDD()
-        // .mapToPair((Row row) -> new Tuple2<String, Double>(row.getString(0),
-        // row.getDouble(1)))
-        // .foreachPartition(iterator -> {
-        // new HBaseWriter().writeBrandReport(IteratorUtils.toList(iterator));
-        // });
-        // Show the result
     }
 
     static void saveDatasetToHBase(Dataset<Row> result, String col) {

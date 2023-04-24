@@ -15,6 +15,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Durations;
+import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -59,23 +60,26 @@ public class KafkaStream {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        JavaPairDStream<String, Integer> counts = stream.map(record -> record.value().toString())
-                .map((String line) -> mapper.readTree(line)).cache()
+        JavaDStream<JsonNode> datas = stream.map(record -> record.value().toString())
+                .map((String line) -> mapper.readTree(line)).cache();
+
+        // Event type count
+        JavaPairDStream<String, Integer> eventTypeCounts = datas
                 .mapToPair((JsonNode actualObj) -> {
                     return new Tuple2<String, Integer>(actualObj.get("event_type").asText(), 1);
                 }).reduceByKey((x, y) -> x + y);
 
-        counts.print();
-        counts.foreachRDD((rdd, time) -> {
-            // HBaseWriter writer = new HBaseWriter();
-            // List<Tuple2<String, Integer>> result = new ArrayList<>();
-            // rdd.foreach(event -> {
-            // result.add(event);
-            // writer.write(time.toString(), event._1(), event._2().toString());
-            // writer.close();
-            // });
-            // // Output to kafa-analytics
-            // new KafkaWriter().writeEvents(result);
+        // Category view count
+        JavaPairDStream<String, Integer> categoryViewCounts = datas
+                .map((JsonNode obj) -> obj.get("category_code").asText(null))
+                .filter(c -> c != null && !c.isBlank())
+                .mapToPair(c -> new Tuple2<String, Integer>(c.split("\\.")[0], 1))
+                .reduceByKey((x, y) -> x + y);
+
+        categoryViewCounts.print();
+
+        eventTypeCounts.print();
+        eventTypeCounts.foreachRDD((rdd, time) -> {
 
             rdd.foreachPartition((events) -> {
                 List<Tuple2<String, Integer>> result = IteratorUtils.toList(events);
