@@ -6,6 +6,7 @@ __pycache__/
 
 
 target/
+!target/*.jar
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup

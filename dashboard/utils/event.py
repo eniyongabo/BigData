@@ -38,9 +38,6 @@ class Event:
         )
 
     def fig(self):
-        # print(self.views)
-        # print(self.purchases)
-        # print(self.carts)
         return go.Figure(
             data=[
                 go.Scatter(
