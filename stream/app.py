@@ -34,17 +34,6 @@ with open("dataset.csv", newline="") as csvfile:
 
     producer.produce(OUT_TOPIC, "{}".encode("utf-8"), callback=delivery_report)
 
-    # while True:
-    #     producer.poll(0)
-    #     d = {
-    #         "view": random.randint(0, 20),
-    #         "purchase": random.randint(0, 20),
-    #         "cart": random.randint(0, 20),
-    #     }
-    #     producer.produce(
-    #         OUT_TOPIC, key="", value=json.dumps(d).encode("utf-8"), callback=delivery_report
-    #     )
-    #     time.sleep(0.1)
     for row in reader:
         producer.poll(0)
         msg = json.dumps(row)

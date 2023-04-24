@@ -36,7 +36,7 @@ public class SparkSQLAnalyze {
                 .add("price", DataTypes.DoubleType)
                 .add("user_id", DataTypes.LongType)
                 .add("user_session", DataTypes.StringType);
-        // Read the CSV file into a DataFrame using the schema
+        // Read the CSV file into a DataFrame using the schema\
         Dataset<Row> df = spark.read().option("header", "true").schema(schema).csv(args[0]);
 
         df.printSchema();
